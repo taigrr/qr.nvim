@@ -348,7 +348,7 @@ function M.build(codewords, version, ec_level, mask_pattern)
     place_fmt(final_bm, mask_pattern)
     final_mask = mask_pattern
   else
-    final_mask, final_bm = mask_mod.select_best(bm, version, ec_level, place_fmt)
+    final_mask, final_bm = mask_mod.select_best(bm, place_fmt)
   end
 
   return final_bm, final_mask

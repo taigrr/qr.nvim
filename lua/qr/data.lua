@@ -412,7 +412,14 @@ function M.char_capacity(version, ec_level, mode)
 
   if mode == M.MODE.NUMERIC then
     -- 10 bits per 3 digits, 7 bits per 2, 4 bits per 1
-    return math.floor(bits / 10) * 3 + math.min(math.floor((bits % 10) / 7) + math.floor((bits % 10) / 4), math.floor(bits % 10 / 4) >= 1 and 1 or 0)
+    local full_groups = math.floor(bits / 10) * 3
+    local rem = bits % 10
+    if rem >= 7 then
+      return full_groups + 2
+    elseif rem >= 4 then
+      return full_groups + 1
+    end
+    return full_groups
   elseif mode == M.MODE.ALPHANUMERIC then
     -- 11 bits per 2 chars, 6 bits per 1
     return math.floor(bits / 11) * 2 + (bits % 11 >= 6 and 1 or 0)

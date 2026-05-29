@@ -48,10 +48,8 @@ function Float.open(lines, title)
   vim.api.nvim_buf_set_lines(self.buf, 0, -1, false, padded)
 
   -- Create backdrop
-  local has_backdrop = false
   local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
   if normal.bg and vim.o.termguicolors then
-    has_backdrop = true
     self.backdrop_buf = vim.api.nvim_create_buf(false, true)
     self.backdrop_win = vim.api.nvim_open_win(self.backdrop_buf, false, {
       relative = "editor",

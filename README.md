@@ -18,8 +18,7 @@ Turn text into a QR code without shelling out to `qrencode` or depending on an e
 
 - Kanji mode exists in the encoder but the public mode selection path does not currently expose real Shift-JIS handling, so non-ASCII text effectively goes through byte mode
 - Rendering is terminal-first; there is no image export or SVG output
-- Tests are solid, but CI is missing right now
-- The README should be clearer about Neovim/version requirements and current limitations
+- Scan reliability in inverted mode depends a lot on terminal/theme contrast
 
 ## Installation
 
@@ -101,7 +100,8 @@ require("qr").setup({
   ec_level = 1,          -- 1=L, 2=M, 3=Q, 4=H
   quiet_zone = 4,        -- Border width in modules
   invert = false,        -- Invert colors for dark backgrounds
-  keymap = "<leader>qr", -- Visual-mode keymap, or false to disable
+  keymap = "<leader>qr",  -- Visual-mode keymap, or false to disable
+  max_title_length = 40,   -- Truncate long floating titles
 })
 ```
 
@@ -118,7 +118,7 @@ require("qr").setup({
 
 - Public auto-mode selection currently chooses numeric, alphanumeric, or byte mode. Kanji support exists internally, but there is not yet a real user-facing Shift-JIS path.
 - Floating window rendering assumes a terminal that displays Unicode half-blocks consistently.
-- Very long titles are truncated in the floating window.
+- Very long titles are truncated in the floating window; `max_title_length` lets you tune that.
 - Empty strings currently encode successfully; that is allowed by the plugin, even if it may not be useful in practice.
 
 ## Implementation notes
@@ -155,7 +155,6 @@ make lint
 ## Suggested follow-up improvements
 
 - Add explicit tests around non-ASCII byte payloads and kanji-mode behavior
-- Consider documenting scan reliability expectations for `invert = true`
 - Add a screenshot or short demo gif once the README copy settles
 - Consider `:QRBuffer` or similar for whole-buffer / current-line ergonomics if you actually want that workflow
 

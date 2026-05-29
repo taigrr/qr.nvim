@@ -222,12 +222,10 @@ end
 
 ---Select the best mask pattern (lowest penalty).
 ---@param bm table QrBitmap (with all function patterns placed, data placed, but no mask yet)
----@param version number
----@param ec_level number
 ---@param place_format_fn fun(bm: table, mask: number) Function to write format info
 ---@return number Best mask pattern (0-7)
 ---@return table QrBitmap The final masked bitmap
-function M.select_best(bm, version, ec_level, place_format_fn)
+function M.select_best(bm, place_format_fn)
   local best_mask = 0
   local best_penalty = math.huge
   local best_bm = nil

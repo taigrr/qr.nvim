@@ -540,6 +540,14 @@ test("encode version 1-L byte mode", function()
   assert_eq(#codewords, qr_data.TOTAL_CODEWORDS[1])
 end)
 
+test("encode UTF-8 byte payload", function()
+  local encode = require("qr.encode")
+  local qr_data = require("qr.data")
+  local text = "こんにちは"
+  local codewords = encode.encode(text, 1, qr_data.EC_LEVEL.L, qr_data.MODE.BYTE)
+  assert_eq(#codewords, qr_data.TOTAL_CODEWORDS[1])
+end)
+
 test("interleave single block is passthrough", function()
   local encode = require("qr.encode")
   local qr_data = require("qr.data")
@@ -1048,6 +1056,13 @@ test("render version 1 line width matches expected", function()
   -- But we need to check display width due to Unicode
   assert_truthy(info.version >= 1)
   assert_truthy(#lines > 0)
+end)
+
+test("render UTF-8 payload", function()
+  local qr = require("qr")
+  local lines, info = qr.render("こんにちは")
+  assert_truthy(#lines > 0)
+  assert_eq(info.mode, 4) -- byte mode
 end)
 
 test("different inputs produce different QR codes", function()
