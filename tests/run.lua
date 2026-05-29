@@ -60,10 +60,7 @@ end
 
 local function assert_table_eq(actual, expected, message)
   if #actual ~= #expected then
-    error(
-      (message or "table length mismatch") .. ": expected " .. #expected .. " elements, got " .. #actual,
-      2
-    )
+    error((message or "table length mismatch") .. ": expected " .. #expected .. " elements, got " .. #actual, 2)
   end
   for i = 1, #expected do
     if actual[i] ~= expected[i] then
