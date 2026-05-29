@@ -18,9 +18,7 @@ jobs:
         with:
           version: latest
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check formatting
-        run: stylua --check .
+          args: --check .
 
   luacheck:
     runs-on: ubuntu-latest
