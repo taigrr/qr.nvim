@@ -15,6 +15,7 @@ local M = {}
 ---@field quiet_zone? number Quiet zone width in modules (default 4)
 ---@field invert? boolean Invert colors for dark terminals (default false)
 ---@field keymap? string|false Visual mode keymap (default "<leader>qr", false to disable)
+---@field max_title_length? number Maximum floating window title length before truncation
 
 ---@type QrConfig
 M.config = {
@@ -22,6 +23,7 @@ M.config = {
   quiet_zone = 4,
   invert = false,
   keymap = "<leader>qr",
+  max_title_length = 40,
 }
 
 ---Generate a QR code bitmap from text.
@@ -89,8 +91,9 @@ function M.show(text, opts)
 
   local lines = M.render(text, opts)
   local title = opts.title or text
-  if #title > 40 then
-    title = title:sub(1, 37) .. "..."
+  local max_title_length = opts.max_title_length or M.config.max_title_length
+  if max_title_length and max_title_length > 3 and #title > max_title_length then
+    title = title:sub(1, max_title_length - 3) .. "..."
   end
 
   float.Float.open(lines, title)
