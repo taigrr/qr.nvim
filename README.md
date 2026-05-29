@@ -152,12 +152,6 @@ make format
 make lint
 ```
 
-## Suggested follow-up improvements
-
-- Add explicit tests around non-ASCII byte payloads and kanji-mode behavior
-- Add a screenshot or short demo gif once the README copy settles
-- Consider `:QRBuffer` or similar for whole-buffer / current-line ergonomics if you actually want that workflow
-
 ## License
 
 [0BSD](LICENSE) © Tai Groot
