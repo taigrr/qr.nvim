@@ -107,6 +107,31 @@ local function reset_modules()
 end
 
 --------------------------------------------------------------------------------
+-- TEST: bit.lua
+--------------------------------------------------------------------------------
+suite("bit")
+
+test("fallback operations match expected 32-bit results", function()
+  local original_bit = rawget(_G, "bit")
+  local original_bit32 = rawget(_G, "bit32")
+  _G.bit = nil
+  _G.bit32 = nil
+  package.loaded["qr.bit"] = nil
+
+  local qr_bit = require("qr.bit")
+  assert_eq(qr_bit.band(0xF0, 0xCC), 0xC0)
+  assert_eq(qr_bit.bor(0xF0, 0x0F), 0xFF)
+  assert_eq(qr_bit.bxor(0xAA, 0x55), 0xFF)
+  assert_eq(qr_bit.band(qr_bit.bnot(0x0F), 0xFF), 0xF0)
+  assert_eq(qr_bit.lshift(1, 31), 0x80000000)
+  assert_eq(qr_bit.rshift(0x80000000, 31), 1)
+
+  package.loaded["qr.bit"] = nil
+  _G.bit = original_bit
+  _G.bit32 = original_bit32
+end)
+
+--------------------------------------------------------------------------------
 -- TEST: galois.lua
 --------------------------------------------------------------------------------
 suite("galois")

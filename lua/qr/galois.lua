@@ -4,6 +4,7 @@
 ---@brief ]]
 
 local M = {}
+local bit = require("qr.bit")
 
 local PRIMITIVE_POLY = 0x11D
 
