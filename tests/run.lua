@@ -1102,9 +1102,9 @@ test("different inputs produce different QR codes", function()
   assert_falsy(same, "different inputs should produce different QR codes")
 end)
 
-test("empty string errors", function()
+test("empty string selects a QR version", function()
   local qr_data = require("qr.data")
-  -- Empty string should still get a version (version 1 can hold 0 bytes)
+  -- Empty strings are valid encoder input; version 1 can hold 0 bytes.
   local v = qr_data.select_version("", qr_data.EC_LEVEL.L, qr_data.MODE.BYTE)
   assert_truthy(v ~= nil)
 end)
