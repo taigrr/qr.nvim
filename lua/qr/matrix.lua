@@ -7,6 +7,7 @@
 local bitmap_mod = require("qr.bitmap")
 local data = require("qr.data")
 local mask_mod = require("qr.mask")
+local bit = require("qr.bit")
 
 local M = {}
 

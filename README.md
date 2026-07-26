@@ -119,7 +119,7 @@ require("qr").setup({
 - Public auto-mode selection currently chooses numeric, alphanumeric, or byte mode. Kanji support exists internally, but there is not yet a real user-facing Shift-JIS path.
 - Floating window rendering assumes a terminal that displays Unicode half-blocks consistently.
 - Very long titles are truncated in the floating window; `max_title_length` lets you tune that.
-- Empty strings currently encode successfully; that is allowed by the plugin, even if it may not be useful in practice.
+- Empty strings are valid input for the Lua encoder, but the `:QR` command treats a missing argument or empty range as a usage warning.
 
 ## Implementation notes
 

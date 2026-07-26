@@ -5,6 +5,7 @@
 ---@brief ]]
 
 local M = {}
+local bit = require("qr.bit")
 
 ---@class QrBitmap
 ---@field size number Width/height in modules

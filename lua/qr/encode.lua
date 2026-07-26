@@ -5,6 +5,7 @@
 
 local data = require("qr.data")
 local reed_solomon = require("qr.reed_solomon")
+local bit = require("qr.bit")
 
 local M = {}
 
