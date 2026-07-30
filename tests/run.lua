@@ -1137,6 +1137,92 @@ test("exceeds version 1 goes to version 2", function()
 end)
 
 --------------------------------------------------------------------------------
+-- TEST: Neovim integration
+--------------------------------------------------------------------------------
+suite("neovim integration")
+
+local has_nvim_api = vim and vim.api and vim.api.nvim_create_user_command
+
+local function close_extra_windows(base_windows)
+  local base = {}
+  for _, win in ipairs(base_windows) do
+    base[win] = true
+  end
+
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if not base[win] and vim.api.nvim_win_is_valid(win) then
+      vim.api.nvim_win_close(win, true)
+    end
+  end
+end
+
+if has_nvim_api then
+  test("setup merges config and creates QR command", function()
+    reset_modules()
+    local qr = require("qr")
+
+    qr.setup({
+      ec_level = 4,
+      quiet_zone = 1,
+      invert = true,
+      keymap = false,
+      max_title_length = 12,
+    })
+
+    assert_eq(qr.config.ec_level, 4)
+    assert_eq(qr.config.quiet_zone, 1)
+    assert_eq(qr.config.invert, true)
+    assert_eq(qr.config.keymap, false)
+    assert_eq(qr.config.max_title_length, 12)
+    assert_truthy(vim.api.nvim_get_commands({})["QR"])
+  end)
+
+  test("QR command opens a floating QR window from arguments", function()
+    reset_modules()
+    local qr = require("qr")
+    qr.setup({ keymap = false })
+
+    local base_windows = vim.api.nvim_list_wins()
+    vim.cmd("QR https://example.com")
+
+    local windows = vim.api.nvim_list_wins()
+    assert_truthy(#windows > #base_windows, "QR command should open a floating window")
+    assert_neq(vim.api.nvim_get_current_win(), base_windows[1], "QR window should receive focus")
+
+    local lines = vim.api.nvim_buf_get_lines(vim.api.nvim_get_current_buf(), 0, -1, false)
+    assert_truthy(#lines > 1)
+
+    close_extra_windows(base_windows)
+  end)
+
+  test("QR command warns instead of opening for empty input", function()
+    reset_modules()
+    local qr = require("qr")
+    qr.setup({ keymap = false })
+
+    local messages = {}
+    local original_notify = vim.notify
+    vim.notify = function(message, level)
+      messages[#messages + 1] = { message = message, level = level }
+    end
+
+    local base_windows = vim.api.nvim_list_wins()
+    vim.cmd("QR")
+
+    vim.notify = original_notify
+
+    assert_eq(#vim.api.nvim_list_wins(), #base_windows)
+    assert_eq(#messages, 1)
+    assert_truthy(messages[1].message:match("Usage: :QR"))
+    assert_eq(messages[1].level, vim.log.levels.WARN)
+  end)
+else
+  test("skips Neovim-only integration tests outside Neovim", function()
+    assert_truthy(true)
+  end)
+end
+
+--------------------------------------------------------------------------------
 -- RESULTS
 --------------------------------------------------------------------------------
 print("\n" .. string.rep("=", 60))
