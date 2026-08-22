@@ -4,7 +4,7 @@ format:
 	stylua .
 
 lint:
-	luacheck lua/ plugin/
+	luacheck lua/ plugin/ tests/run.lua
 
 test:
 	nvim --headless -u NONE -c "lua dofile('tests/run.lua')" -c qa
