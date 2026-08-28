@@ -26,6 +26,46 @@ M.config = {
   max_title_length = 40,
 }
 
+local function is_integer(value)
+  return type(value) == "number" and value == math.floor(value)
+end
+
+local function validate_ec_level(ec_level)
+  if not is_integer(ec_level) or ec_level < 1 or ec_level > 4 then
+    error("ec_level must be an integer from 1 to 4", 3)
+  end
+end
+
+local function validate_quiet_zone(quiet_zone)
+  if not is_integer(quiet_zone) or quiet_zone < 0 then
+    error("quiet_zone must be a non-negative integer", 3)
+  end
+end
+
+local function validate_max_title_length(max_title_length)
+  if max_title_length ~= nil and (not is_integer(max_title_length) or max_title_length < 0) then
+    error("max_title_length must be a non-negative integer", 3)
+  end
+end
+
+local function validate_config(opts)
+  if opts.ec_level ~= nil then
+    validate_ec_level(opts.ec_level)
+  end
+  if opts.quiet_zone ~= nil then
+    validate_quiet_zone(opts.quiet_zone)
+  end
+  if opts.max_title_length ~= nil then
+    validate_max_title_length(opts.max_title_length)
+  end
+  if opts.keymap ~= nil and opts.keymap ~= false and type(opts.keymap) ~= "string" then
+    error("keymap must be a string or false", 3)
+  end
+  if opts.invert ~= nil and type(opts.invert) ~= "boolean" then
+    error("invert must be a boolean", 3)
+  end
+end
+
 ---Generate a QR code bitmap from text.
 ---@param text string
 ---@param opts? { ec_level?: number, mode?: number, version?: number }
@@ -39,6 +79,8 @@ function M.generate(text, opts)
   local matrix = require("qr.matrix")
 
   local ec_level = opts.ec_level or M.config.ec_level
+  validate_ec_level(ec_level)
+
   local mode = opts.mode or qr_data.select_mode(text)
   local version = opts.version or qr_data.select_version(text, ec_level, mode)
 
@@ -64,6 +106,9 @@ function M.render(text, opts)
 
   local ec_level = opts.ec_level or M.config.ec_level
   local quiet_zone = opts.quiet_zone or M.config.quiet_zone
+  validate_ec_level(ec_level)
+  validate_quiet_zone(quiet_zone)
+
   local invert = opts.invert
   if invert == nil then
     invert = M.config.invert
@@ -92,6 +137,8 @@ function M.show(text, opts)
   local lines = M.render(text, opts)
   local title = opts.title or text
   local max_title_length = opts.max_title_length or M.config.max_title_length
+  validate_max_title_length(max_title_length)
+
   if max_title_length and max_title_length > 3 and #title > max_title_length then
     title = title:sub(1, max_title_length - 3) .. "..."
   end
@@ -121,6 +168,7 @@ end
 
 ---@param opts? QrConfig
 function M.setup(opts)
+  validate_config(opts or {})
   M.config = vim.tbl_deep_extend("force", M.config, opts or {})
 
   -- User command. Accepts either an argument (:QR <text>) or a range
