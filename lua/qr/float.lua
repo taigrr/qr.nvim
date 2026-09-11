@@ -31,9 +31,9 @@ function Float.open(lines, title)
   end
   local height = #lines
 
-  -- Add padding
-  width = width + 4
-  height = height + 2
+  -- Add padding, then clamp to the editor so small splits still open.
+  width = math.min(width + 4, math.max(vim.o.columns - 2, 1))
+  height = math.min(height + 2, math.max(vim.o.lines - 2, 1))
 
   -- Create buffer
   self.buf = vim.api.nvim_create_buf(false, true)
@@ -68,8 +68,8 @@ function Float.open(lines, title)
   end
 
   -- Open main window
-  local row = math.floor((vim.o.lines - height) / 2)
-  local col = math.floor((vim.o.columns - width) / 2)
+  local row = math.max(math.floor((vim.o.lines - height) / 2), 0)
+  local col = math.max(math.floor((vim.o.columns - width) / 2), 0)
 
   self.win = vim.api.nvim_open_win(self.buf, true, {
     relative = "editor",
