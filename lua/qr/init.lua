@@ -54,7 +54,7 @@ end
 
 ---Generate and render a QR code as display lines.
 ---@param text string
----@param opts? { ec_level?: number, quiet_zone?: number, invert?: boolean }
+---@param opts? { ec_level?: number, quiet_zone?: number, invert?: boolean, mode?: number, version?: number }
 ---@return string[] lines
 ---@return { version: number, mask: number, ec_level: number, mode: number }
 function M.render(text, opts)
@@ -69,8 +69,12 @@ function M.render(text, opts)
     invert = M.config.invert
   end
 
-  local mode = qr_data.select_mode(text)
-  local bm, version, mask = M.generate(text, { ec_level = ec_level })
+  local mode = opts.mode or qr_data.select_mode(text)
+  local bm, version, mask = M.generate(text, {
+    ec_level = ec_level,
+    mode = mode,
+    version = opts.version,
+  })
 
   local lines
   if invert then
