@@ -1210,6 +1210,41 @@ if has_nvim_api then
     close_extra_windows(base_windows)
   end)
 
+  test("floating QR window clamps to small editors", function()
+    reset_modules()
+    local float = require("qr.float")
+    local base_windows = vim.api.nvim_list_wins()
+    local original_columns = vim.o.columns
+    local original_lines = vim.o.lines
+
+    vim.o.columns = 20
+    vim.o.lines = 8
+
+    local ok, qr_float = pcall(float.Float.open, {
+      string.rep("x", 40),
+      string.rep("y", 40),
+      string.rep("z", 40),
+      string.rep("w", 40),
+      string.rep("v", 40),
+      string.rep("u", 40),
+      string.rep("t", 40),
+      string.rep("s", 40),
+    }, "small")
+
+    vim.o.columns = original_columns
+    vim.o.lines = original_lines
+
+    assert_truthy(ok, qr_float)
+    local config = vim.api.nvim_win_get_config(qr_float.win)
+    assert_truthy(config.width <= 18, "width should fit within tiny editor")
+    assert_truthy(config.height <= 6, "height should fit within tiny editor")
+    assert_truthy(config.row >= 0, "row should not be negative")
+    assert_truthy(config.col >= 0, "col should not be negative")
+
+    qr_float:close()
+    close_extra_windows(base_windows)
+  end)
+
   test("QR command warns instead of opening for empty input", function()
     reset_modules()
     local qr = require("qr")
