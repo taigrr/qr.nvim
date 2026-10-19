@@ -1087,6 +1087,21 @@ test("render UTF-8 payload", function()
   assert_eq(info.mode, 4) -- byte mode
 end)
 
+test("render honors explicit mode", function()
+  local qr = require("qr")
+  local qr_data = require("qr.data")
+  local lines, info = qr.render("12345", { mode = qr_data.MODE.BYTE })
+  assert_truthy(#lines > 0)
+  assert_eq(info.mode, qr_data.MODE.BYTE)
+end)
+
+test("render honors explicit version", function()
+  local qr = require("qr")
+  local lines, info = qr.render("HELLO", { version = 2 })
+  assert_truthy(#lines > 0)
+  assert_eq(info.version, 2)
+end)
+
 test("different inputs produce different QR codes", function()
   local qr = require("qr")
   qr.config.ec_level = 1
