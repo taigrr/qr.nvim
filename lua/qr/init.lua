@@ -15,7 +15,7 @@ local M = {}
 ---@field quiet_zone? number Quiet zone width in modules (default 4)
 ---@field invert? boolean Invert colors for dark terminals (default false)
 ---@field keymap? string|false Visual mode keymap (default "<leader>qr", false to disable)
----@field max_title_length? number Maximum floating window title length before truncation
+---@field max_title_length? number Maximum floating window title length in characters before truncation
 
 ---@type QrConfig
 M.config = {
@@ -143,8 +143,8 @@ function M.show(text, opts)
   local max_title_length = opts.max_title_length or M.config.max_title_length
   validate_max_title_length(max_title_length)
 
-  if max_title_length and max_title_length > 3 and #title > max_title_length then
-    title = title:sub(1, max_title_length - 3) .. "..."
+  if max_title_length and max_title_length > 3 and vim.fn.strchars(title) > max_title_length then
+    title = vim.fn.strcharpart(title, 0, max_title_length - 3) .. "..."
   end
 
   float.Float.open(lines, title)
