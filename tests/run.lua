@@ -1227,6 +1227,25 @@ if has_nvim_api then
     end, "negative max_title_length should throw")
   end)
 
+  test("setup rejects non-finite numeric options without changing config", function()
+    reset_modules()
+    local qr = require("qr")
+    local defaults = {
+      ec_level = qr.config.ec_level,
+      quiet_zone = qr.config.quiet_zone,
+      max_title_length = qr.config.max_title_length,
+    }
+
+    for option, default in pairs(defaults) do
+      for _, value in ipairs({ math.huge, -math.huge, 0 / 0 }) do
+        assert_error(function()
+          qr.setup({ [option] = value })
+        end, option .. " should reject non-finite values")
+        assert_eq(qr.config[option], default, "invalid setup must preserve " .. option)
+      end
+    end
+  end)
+
   test("show truncates titles by characters without splitting UTF-8", function()
     reset_modules()
     local qr = require("qr")

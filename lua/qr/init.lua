@@ -27,7 +27,7 @@ M.config = {
 }
 
 local function is_integer(value)
-  return type(value) == "number" and value == math.floor(value)
+  return type(value) == "number" and value > -math.huge and value < math.huge and value == math.floor(value)
 end
 
 local function validate_ec_level(ec_level)
