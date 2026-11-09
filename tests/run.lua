@@ -1227,6 +1227,36 @@ if has_nvim_api then
     end, "negative max_title_length should throw")
   end)
 
+  test("show truncates titles by characters without splitting UTF-8", function()
+    reset_modules()
+    local qr = require("qr")
+    local float = require("qr.float")
+    local original_open = float.Float.open
+    local actual_title
+    float.Float.open = function(_, title)
+      actual_title = title
+    end
+
+    local ok, err = pcall(function()
+      local cases = {
+        { "caféééé", "caf..." },
+        { "你好世界你好世", "你好世..." },
+        { "😀😁😂😃😄😅😆", "😀😁😂..." },
+        { "abcdefg", "abc..." },
+      }
+      for _, case in ipairs(cases) do
+        qr.show("test", { title = case[1], max_title_length = 6 })
+        assert_eq(actual_title, case[2])
+      end
+      qr.show("test", { title = "你好世界", max_title_length = 6 })
+      assert_eq(actual_title, "你好世界", "short Unicode title should not be truncated")
+      qr.show("test", { title = "你好世界你好世", max_title_length = 0 })
+      assert_eq(actual_title, "你好世界你好世", "zero should disable truncation")
+    end)
+    float.Float.open = original_open
+    assert_truthy(ok, err)
+  end)
+
   test("QR command opens a floating QR window from arguments", function()
     reset_modules()
     local qr = require("qr")
