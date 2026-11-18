@@ -1206,6 +1206,34 @@ if has_nvim_api then
     assert_truthy(vim.api.nvim_get_commands({})["QR"])
   end)
 
+  test("setup replaces and disables its previous visual keymap", function()
+    reset_modules()
+    local qr = require("qr")
+    local first = "<F10>"
+    local second = "<F11>"
+    qr.setup({ keymap = first })
+    assert_eq(vim.fn.maparg(first, "x", false, true).desc, "Show QR code for selection")
+    qr.setup({ keymap = second })
+    assert_eq(vim.fn.maparg(first, "x"), "", "previous mapping should be removed")
+    assert_eq(vim.fn.maparg(second, "x", false, true).desc, "Show QR code for selection")
+    qr.setup({ keymap = false })
+    assert_eq(vim.fn.maparg(second, "x"), "", "disabled mapping should be removed")
+  end)
+
+  test("setup tolerates removed keymaps and preserves user replacements", function()
+    reset_modules()
+    local qr = require("qr")
+    local lhs = "<F10>"
+    qr.setup({ keymap = lhs })
+    vim.keymap.del("x", lhs)
+    qr.setup({ keymap = false })
+    qr.setup({ keymap = lhs })
+    vim.keymap.set("x", lhs, "<Nop>", { desc = "User mapping" })
+    qr.setup({ keymap = false })
+    assert_eq(vim.fn.maparg(lhs, "x", false, true).desc, "User mapping")
+    vim.keymap.del("x", lhs)
+  end)
+
   test("setup rejects invalid config", function()
     reset_modules()
     local qr = require("qr")

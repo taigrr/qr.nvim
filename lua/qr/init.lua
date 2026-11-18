@@ -9,6 +9,7 @@
 ---@brief ]]
 
 local M = {}
+local active_callback
 
 ---@class QrConfig
 ---@field ec_level? number Error correction level (1=L, 2=M, 3=Q, 4=H)
@@ -193,9 +194,20 @@ function M.setup(opts)
     range = true,
   })
 
+  -- Remove only our own previous mapping, not a user replacement.
+  if active_callback then
+    for _, mapping in ipairs(vim.api.nvim_get_keymap("x")) do
+      if mapping.callback == active_callback then
+        vim.keymap.del("x", mapping.lhs)
+        break
+      end
+    end
+    active_callback = nil
+  end
+
   -- Visual mode keymap
   if M.config.keymap then
-    vim.keymap.set("x", M.config.keymap, function()
+    local callback = function()
       -- Read selection while still in visual mode.
       local text = get_visual_selection()
       -- Leave visual mode, then open the float on the next tick so the
@@ -211,7 +223,9 @@ function M.setup(opts)
           vim.notify("No text selected", vim.log.levels.WARN)
         end
       end)
-    end, { desc = "Show QR code for selection" })
+    end
+    vim.keymap.set("x", M.config.keymap, callback, { desc = "Show QR code for selection" })
+    active_callback = callback
   end
 end
 
